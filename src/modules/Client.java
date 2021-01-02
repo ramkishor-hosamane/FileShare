@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import application.SendController;
+import javafx.application.Platform;
 public class Client {
 	public  DataOutputStream dataOutputStream = null;
     public  DataInputStream dataInputStream = null;
@@ -12,6 +14,8 @@ public class Client {
 	public ObjectInputStream inStream;
 	public  ArrayList<String> files;
 	public Socket socket;
+    public double size;
+    public double total_size;
     
 	  public Client(Socket socket) throws IOException {
 			this.socket = socket;
@@ -56,19 +60,42 @@ public class Client {
     }
 */
   
-	public  void sendFile(String current_file) throws Exception{
+	public  void sendFile(String current_file,SendController sec) throws Exception{
         int bytes = 0;
         File file = new File(current_file);
         FileInputStream fileInputStream = new FileInputStream(file);
-        
+          //Update Progressbar
+	        Platform.runLater(new Runnable() {
+		            @Override
+		            public void run() {
+ 		    		 	String[] file_parts = current_file.split("/");
+  		    		 	String file_name = file_parts[file_parts.length-1];
+		                sec.Name.setText("Sending "+file_name);
+
+		            }
+		          });	
         // send file size
+	    total_size = (double)file.length();
+	    size = 0.0;
         dataOutputStream.writeLong(file.length());  
         // break file into chunks
         byte[] buffer = new byte[16*1024];
         while ((bytes=fileInputStream.read(buffer))!=-1){
-        	//System.out.println("Sending in "+ current_file +" size is ");
-            dataOutputStream.write(buffer,0,bytes);
+        	  size+=bytes;
+        	
+            //Update Progressbar
+  	        Platform.runLater(new Runnable() {
+  		            @Override
+  		            public void run() {
+  		  	         sec.file_progress_bar.setProgress(size/total_size);
+  		            }
+  		          });	
+
+        	
+        	dataOutputStream.write(buffer,0,bytes);
             dataOutputStream.flush();
+
+        
         }
         fileInputStream.close();
     }

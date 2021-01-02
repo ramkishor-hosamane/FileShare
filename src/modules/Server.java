@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import javafx.application.Platform;
+import application.MainController;
 
 public class Server {
 	public  DataOutputStream dataOutputStream = null;
@@ -18,6 +20,8 @@ public class Server {
 	public Socket clientSocket;
 	public ServerSocket serverSocket;
 	public  ArrayList<String> files;
+	private Object progress ;
+	private long total_size;
 
 	public Server(ServerSocket s) throws IOException {
 		serverSocket = s;
@@ -37,44 +41,29 @@ public class Server {
         clientSocket.close();
 	}
 	
-	/*
-    public static void main(String[] args) {
-        try{
-        	
-        	Server server = new Server(new ServerSocket(5000));
-            System.out.println("listening to port:5000");
- 
-            Packet recvPacket = (Packet)server.inStream.readObject();
 
-            server.files = (recvPacket.files);
-	        System.out.println("Got files");
-            for(String file : server.files) {
-            	
-    		 	String[] file_parts = file.toString().split("/");
-    		 	String file_name = file_parts[file_parts.length-1];
-    	        System.out.println("Receving file "+file_name);
-
-                server.receiveFile("/home/ram/Output/"+file_name);
-            	
-            }
-            
-            server.destroy();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-*/
-    public  void receiveFile(String fileName) throws Exception{
+    public  void receiveFile(String fileName,MainController recvr) throws Exception{
         int bytes = 0;
         FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+        double size = dataInputStream.readLong();     // read file size
+
+        total_size = (long) size;
         
-        long size = dataInputStream.readLong();     // read file size
         byte[] buffer = new byte[16*1024];
         while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
             fileOutputStream.write(buffer,0,bytes);
             size -= bytes;      // read upto file size
-        	//System.out.println("Receving in in "+ fileName +" size is "+size);
+        	progress = 1.0 - (size/total_size);
+			
+        	// Update Progressbar
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+
+					recvr.file_progress_bar.setProgress((double) progress);
+				}
+			});
+            //System.out.println("Receving in in "+ fileName +" progress is "+ progress);
 
         }
         fileOutputStream.close();

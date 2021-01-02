@@ -75,8 +75,10 @@ public class SendController implements Initializable {
 			new FileRecord(1, "Pasanga HD.mp4", "/home/ram/Pasanga HD.mp4"),
 			new FileRecord(2, "ib.jar", "/home/ram/lib.jar"),
 			new FileRecord(3, "PuriyathaTamil.mp4", "/home/ram/Videos/PuriyathaTamil.mp4"),
-			new FileRecord(4, "mfmixsouth_Forensic.mkv", "/home/ram/Videos/@mfmixsouth_Forensic _2020_Malayalam HDTVRip.mkv"),
-			new FileRecord(5, "Beans.mkv", "/home/ram/Videos/Mr.Beans.Holiday.2007.480p.BRRip.Hindi[Themoviesflix.com].Dual-Audio (1).mkv")
+			new FileRecord(4, "mfmixsouth_Forensic.mkv",
+					"/home/ram/Videos/@mfmixsouth_Forensic _2020_Malayalam HDTVRip.mkv"),
+			new FileRecord(5, "Beans.mkv",
+					"/home/ram/Videos/Mr.Beans.Holiday.2007.480p.BRRip.Hindi[Themoviesflix.com].Dual-Audio (1).mkv")
 
 	);;
 
@@ -102,11 +104,12 @@ public class SendController implements Initializable {
 		System.out.println("Setiing to " + reciever_ip);
 		this.reciever_ip = reciever_ip;
 	}
+
 	public String getMyip() throws SocketException, UnknownHostException {
 		final DatagramSocket socket = new DatagramSocket();
-		  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-		  String ip = socket.getLocalAddress().getHostAddress();
-		
+		socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+		String ip = socket.getLocalAddress().getHostAddress();
+		socket.close();
 		return ip;
 	}
 
@@ -153,9 +156,10 @@ public class SendController implements Initializable {
 			public void run() {
 
 				try {
-
+					String final_ip = reciever_ip_field.getText();
+					System.out.println("Final ip is "+final_ip);
 					progress = 0;
-					client = new Client(new Socket(reciever_ip_field.getText(), 5000));
+					client = new Client(new Socket(final_ip, 5000));
 					for (FileRecord file_rec : data) {
 						client.files.add(file_rec.file_path);
 					}
@@ -203,8 +207,7 @@ public class SendController implements Initializable {
 							sec.file_progress_bar.setVisible(false);
 							sec.file_label.setVisible(false);
 							sec.total_progress_label.setVisible(false);
-						
-						
+
 						}
 					});
 

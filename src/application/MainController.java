@@ -56,13 +56,11 @@ public class MainController {
 	@FXML
 	private Text my_ip;
 
-	private String ip;
-
 	public String getMyip() throws SocketException, UnknownHostException {
 		final DatagramSocket socket = new DatagramSocket();
 		  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 		  String ip = socket.getLocalAddress().getHostAddress();
-		
+		  socket.close();
 		return ip;
 	}
 

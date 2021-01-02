@@ -3,7 +3,6 @@ package modules;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import application.SendController;
 import javafx.application.Platform;

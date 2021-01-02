@@ -229,7 +229,7 @@ public class SendController implements Initializable {
 	void onAddFiles(ActionEvent event) {
 
 		FileChooser fc = new FileChooser();
-		fc.setInitialDirectory(new File("/home/ram"));
+		fc.setInitialDirectory(new File(System.getProperty("user.dir")));
 		List<File> selectedFiles = fc.showOpenMultipleDialog(null);
 		if (selectedFiles != null) {
 			for (File file : selectedFiles) {
